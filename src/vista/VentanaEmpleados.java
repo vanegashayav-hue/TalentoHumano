@@ -3,6 +3,7 @@ package vista;
 import controlador.EmpleadoControlador;
 import modelo.EmpleadoAdministrativo;
 import modelo.EmpleadoBase;
+import modelo.EmpleadoComercial;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,7 +14,6 @@ public class VentanaEmpleados extends JFrame {
 
     private final EmpleadoControlador controlador;
 
-    // Campos del formulario
     private final JTextField txtCedula = new JTextField();
     private final JTextField txtNombre = new JTextField();
     private final JTextField txtSalario = new JTextField();
@@ -22,17 +22,28 @@ public class VentanaEmpleados extends JFrame {
     private final JComboBox<String> cmbTipo =
             new JComboBox<>(EmpleadoControlador.TIPOS_EMPLEADO);
 
-    // Botones
-    private final JButton btnAgregar = new JButton("Agregar");
-    private final JButton btnBuscar = new JButton("Buscar");
-    private final JButton btnActualizar = new JButton("Actualizar");
-    private final JButton btnEliminar = new JButton("Eliminar");
-    private final JButton btnLimpiar = new JButton("Limpiar");
-    private final JButton btnHistorial = new JButton("Historial");
+    private final JButton btnAgregar =
+            new JButton("Agregar");
 
-    // Tabla y resumen
+    private final JButton btnBuscar =
+            new JButton("Buscar");
+
+    private final JButton btnActualizar =
+            new JButton("Actualizar");
+
+    private final JButton btnEliminar =
+            new JButton("Eliminar");
+
+    private final JButton btnLimpiar =
+            new JButton("Limpiar");
+
+    private final JButton btnHistorial =
+            new JButton("Historial");
+
     private DefaultTableModel datosTabla;
-    private final JLabel lblResumen = new JLabel();
+
+    private final JLabel lblResumen =
+            new JLabel();
 
     public VentanaEmpleados(EmpleadoControlador controlador) {
 
@@ -42,20 +53,40 @@ public class VentanaEmpleados extends JFrame {
 
         setLayout(new BorderLayout(10, 10));
 
-        add(construirFormulario(), BorderLayout.NORTH);
-        add(construirTabla(), BorderLayout.CENTER);
-
-        lblResumen.setBorder(
-                BorderFactory.createEmptyBorder(0, 10, 10, 10)
+        add(
+                construirFormulario(),
+                BorderLayout.NORTH
         );
 
-        add(lblResumen, BorderLayout.SOUTH);
+        add(
+                construirTabla(),
+                BorderLayout.CENTER
+        );
+
+        lblResumen.setBorder(
+                BorderFactory.createEmptyBorder(
+                        0,
+                        10,
+                        10,
+                        10
+                )
+        );
+
+        add(
+                lblResumen,
+                BorderLayout.SOUTH
+        );
 
         conectarEventos();
+
         refrescarTabla();
 
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(
+                JFrame.EXIT_ON_CLOSE
+        );
+
         setSize(780, 540);
+
         setLocationRelativeTo(null);
     }
 
@@ -77,9 +108,9 @@ public class VentanaEmpleados extends JFrame {
         campos.add(new JLabel("Tipo de empleado:"));
         campos.add(cmbTipo);
 
-        campos.add(new JLabel(
-                "Bonificación (solo administrativos):"
-        ));
+        campos.add(
+                new JLabel("Bonificación / Comisión %:")
+        );
 
         campos.add(txtBonificacion);
 
@@ -108,7 +139,10 @@ public class VentanaEmpleados extends JFrame {
 
         panel.setBorder(
                 BorderFactory.createEmptyBorder(
-                        10, 10, 0, 10
+                        10,
+                        10,
+                        0,
+                        10
                 )
         );
 
@@ -126,12 +160,10 @@ public class VentanaEmpleados extends JFrame {
     }
 
     private String texto(JTextField campo) {
-
         return campo.getText().trim();
     }
 
     private String tipoSeleccionado() {
-
         return (String) cmbTipo.getSelectedItem();
     }
 
@@ -149,6 +181,7 @@ public class VentanaEmpleados extends JFrame {
                 columnas,
                 0
         ) {
+
             @Override
             public boolean isCellEditable(
                     int fila,
@@ -160,7 +193,8 @@ public class VentanaEmpleados extends JFrame {
 
         JTable tabla = new JTable(datosTabla);
 
-        JScrollPane scroll = new JScrollPane(tabla);
+        JScrollPane scroll =
+                new JScrollPane(tabla);
 
         scroll.setBorder(
                 BorderFactory.createTitledBorder(
@@ -211,20 +245,19 @@ public class VentanaEmpleados extends JFrame {
         );
     }
 
-    // ======================= EVENTOS =======================
-
     private void conectarEventos() {
 
         cmbTipo.addActionListener(e -> {
 
-            boolean esAdministrativo =
-                    tipoSeleccionado().equals("Administrativo");
+            boolean permiteCampoAdicional =
+                    tipoSeleccionado().equals("Administrativo")
+                            || tipoSeleccionado().equals("Comercial");
 
             txtBonificacion.setEnabled(
-                    esAdministrativo
+                    permiteCampoAdicional
             );
 
-            if (!esAdministrativo) {
+            if (!permiteCampoAdicional) {
                 txtBonificacion.setText("");
             }
         });
@@ -270,7 +303,9 @@ public class VentanaEmpleados extends JFrame {
         );
     }
 
-    private void mostrarResultado(String mensaje) {
+    private void mostrarResultado(
+            String mensaje
+    ) {
 
         JOptionPane.showMessageDialog(
                 this,
@@ -302,7 +337,8 @@ public class VentanaEmpleados extends JFrame {
             JOptionPane.showMessageDialog(
                     this,
                     "No se encontró ningún empleado con la cédula "
-                            + cedula + "."
+                            + cedula
+                            + "."
             );
 
             return;
@@ -334,6 +370,18 @@ public class VentanaEmpleados extends JFrame {
                             administrativo.getBonificacion()
                     )
             );
+
+        } else if (empleado instanceof EmpleadoComercial) {
+
+            EmpleadoComercial comercial =
+                    (EmpleadoComercial) empleado;
+
+            txtBonificacion.setText(
+                    String.format(
+                            "%.0f",
+                            comercial.getPorcentajeComision()
+                    )
+            );
         }
     }
 
@@ -341,18 +389,24 @@ public class VentanaEmpleados extends JFrame {
 
         String cedula = texto(txtCedula);
 
-        int respuesta = JOptionPane.showConfirmDialog(
-                this,
-                "¿Seguro que deseas eliminar al empleado "
-                        + "con cédula " + cedula + "?",
-                "Confirmar eliminación",
-                JOptionPane.YES_NO_OPTION
-        );
+        int respuesta =
+                JOptionPane.showConfirmDialog(
+                        this,
+                        "¿Seguro que deseas eliminar al empleado "
+                                + "con cédula "
+                                + cedula
+                                + "?",
+                        "Confirmar eliminación",
+                        JOptionPane.YES_NO_OPTION
+                );
 
-        if (respuesta == JOptionPane.YES_OPTION) {
+        if (respuesta ==
+                JOptionPane.YES_OPTION) {
 
             mostrarResultado(
-                    controlador.eliminarEmpleado(cedula)
+                    controlador.eliminarEmpleado(
+                            cedula
+                    )
             );
 
             limpiarFormulario();
@@ -388,7 +442,9 @@ public class VentanaEmpleados extends JFrame {
 
         String texto = "";
 
-        for (int i = 0; i < historial.size(); i++) {
+        for (int i = 0;
+             i < historial.size();
+             i++) {
 
             texto += (i + 1)
                     + ". "
