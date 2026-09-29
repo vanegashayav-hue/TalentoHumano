@@ -1,13 +1,20 @@
+import controlador.EmpleadoControlador;
 import vista.VentanaEmpleados;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 
 public class Main {
 
     public static void main(String[] args) {
 
         SwingUtilities.invokeLater(() -> {
-            VentanaEmpleados ventana = new VentanaEmpleados();
+
+            EmpleadoControlador controlador =
+                    new EmpleadoControlador();
+
+            VentanaEmpleados ventana =
+                    new VentanaEmpleados(controlador);
+
             ventana.setVisible(true);
         });
     }
